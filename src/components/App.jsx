@@ -3,6 +3,7 @@ import { Component } from 'react';
 import { SearchBar } from './SearchBar/SearchBar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Loader } from './Loader/Loader';
+import { Placeholder } from './Placeholder/Placeholder';
 import { LoadMoreBtn } from './LoadMoreBtn/LoadMoreBtn';
 import { Modal } from './Modal/Modal';
 
@@ -13,10 +14,10 @@ import { GlobalStyle } from './GlobalStyle';
 
 export class App extends Component {
   state = {
+    query: '',
     images: [],
-    searchQuery: '',
     page: null,
-    total: null,
+    loadMore: false,
 
     isLoading: false,
     error: null,
@@ -27,8 +28,8 @@ export class App extends Component {
   };
 
   async componentDidUpdate(prevProps, prevState) {
-    const prevQuery = prevState.searchQuery;
-    const currentQuery = this.state.searchQuery;
+    const prevQuery = prevState.query;
+    const currentQuery = this.state.query;
     const prevPage = prevState.page;
     const currentPage = this.state.page;
 
@@ -40,9 +41,11 @@ export class App extends Component {
 
     try {
       const data = await fetchImages(currentQuery, currentPage);
+      const loadMore = currentPage * per_page < data.totalHits;
+
       this.setState(prevState => ({
         images: [...prevState.images, ...data.hits],
-        total: data.totalHits,
+        loadMore,
       }));
     } catch (error) {
       this.setState({ error });
@@ -51,8 +54,8 @@ export class App extends Component {
     }
   }
 
-  searchFormSubmit = searchQuery => {
-    this.setState({ searchQuery, images: [], page: 1 });
+  searchFormSubmit = query => {
+    this.setState({ query, images: [], page: 1 });
   };
 
   incrementPage = () => {
@@ -68,10 +71,18 @@ export class App extends Component {
   };
 
   render() {
-    const { images, isLoading, page, total, isOpenModal, img, tags } =
-      this.state;
-    const isNeedLoadMore =
-      images.length > 0 && !isLoading && page * per_page < total;
+    const {
+      query,
+      images,
+      isLoading,
+      error,
+      loadMore,
+      isOpenModal,
+      img,
+      tags,
+    } = this.state;
+    const isEmptyResults = query && !error && !isLoading && !images.length;
+    const isNeedLoadMore = !isLoading && loadMore;
 
     return (
       <AppWrapper>
@@ -82,6 +93,14 @@ export class App extends Component {
           <ImageGallery images={images} onOpen={this.openModal} />
         )}
         {isLoading && <Loader />}
+        {isEmptyResults && (
+          <Placeholder query={query}>
+            No any results by <b>"{query}"</b> request
+          </Placeholder>
+        )}
+        {error && (
+          <Placeholder query={query}>Whooops.. {error.message}</Placeholder>
+        )}
         {isNeedLoadMore && <LoadMoreBtn onClick={this.incrementPage} />}
         {isOpenModal && (
           <Modal img={img} tags={tags} onClose={this.closeModal} />

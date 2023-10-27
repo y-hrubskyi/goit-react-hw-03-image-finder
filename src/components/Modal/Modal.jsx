@@ -17,7 +17,7 @@ export class Modal extends Component {
     }
   };
 
-  handleClick = e => {
+  handleOverlayClick = e => {
     if (e.target === e.currentTarget) {
       this.props.onClose();
     }
@@ -27,7 +27,7 @@ export class Modal extends Component {
     const { img, tags } = this.props;
 
     return (
-      <Overlay onClick={this.handleClick}>
+      <Overlay onClick={this.handleOverlayClick}>
         <StyledModal>
           <img src={img} alt={tags} />
         </StyledModal>

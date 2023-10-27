@@ -4,13 +4,13 @@ export const SearchBar = ({ onSubmit }) => {
   const handleSubmit = e => {
     e.preventDefault();
 
-    const searchQuery = e.target.elements.query.value;
-    if (!searchQuery) {
+    const query = e.target.elements.query.value;
+    if (!query) {
       alert('Enter search query!');
       return;
     }
 
-    onSubmit(searchQuery);
+    onSubmit(query);
   };
 
   return (
