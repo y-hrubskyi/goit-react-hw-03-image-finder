@@ -4,6 +4,7 @@ import { SearchBar } from './SearchBar/SearchBar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Loader } from './Loader/Loader';
 import { LoadMoreBtn } from './LoadMoreBtn/LoadMoreBtn';
+import { Modal } from './Modal/Modal';
 
 import { fetchImages, per_page } from 'services/api';
 
@@ -19,6 +20,10 @@ export class App extends Component {
 
     isLoading: false,
     error: null,
+
+    isOpenModal: false,
+    img: null,
+    tags: null,
   };
 
   async componentDidUpdate(prevProps, prevState) {
@@ -54,8 +59,17 @@ export class App extends Component {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
+  openModal = (img, tags) => {
+    this.setState({ isOpenModal: true, img, tags });
+  };
+
+  closeModal = () => {
+    this.setState({ isOpenModal: false });
+  };
+
   render() {
-    const { images, isLoading, page, total } = this.state;
+    const { images, isLoading, page, total, isOpenModal, img, tags } =
+      this.state;
     const isNeedLoadMore =
       images.length > 0 && !isLoading && page * per_page < total;
 
@@ -64,9 +78,14 @@ export class App extends Component {
         <GlobalStyle />
 
         <SearchBar onSubmit={this.searchFormSubmit} />
-        {images.length > 0 && <ImageGallery images={images} />}
+        {images.length > 0 && (
+          <ImageGallery images={images} onOpen={this.openModal} />
+        )}
         {isLoading && <Loader />}
         {isNeedLoadMore && <LoadMoreBtn onClick={this.incrementPage} />}
+        {isOpenModal && (
+          <Modal img={img} tags={tags} onClose={this.closeModal} />
+        )}
       </AppWrapper>
     );
   }

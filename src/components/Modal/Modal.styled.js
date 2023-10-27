@@ -13,7 +13,6 @@ export const Overlay = styled.div`
   height: 100vh;
 
   background-color: rgba(0, 0, 0, 0.8);
-  /* pointer-events: none; */
 `;
 
 export const StyledModal = styled.div`
