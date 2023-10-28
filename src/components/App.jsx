@@ -55,6 +55,10 @@ export class App extends Component {
   }
 
   searchFormSubmit = query => {
+    if (this.state.query === query) {
+      return;
+    }
+
     this.setState({ query, images: [], page: 1 });
   };
 
