@@ -5,7 +5,6 @@ import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Loader } from './Loader/Loader';
 import { Placeholder } from './Placeholder/Placeholder';
 import { LoadMoreBtn } from './LoadMoreBtn/LoadMoreBtn';
-import { Modal } from './Modal/Modal';
 
 import { fetchImages, per_page } from 'services/api';
 
@@ -21,10 +20,6 @@ export class App extends Component {
 
     isLoading: false,
     error: null,
-
-    isOpenModal: false,
-    img: null,
-    tags: null,
   };
 
   async componentDidUpdate(prevProps, prevState) {
@@ -66,25 +61,8 @@ export class App extends Component {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
-  openModal = (img, tags) => {
-    this.setState({ isOpenModal: true, img, tags });
-  };
-
-  closeModal = () => {
-    this.setState({ isOpenModal: false });
-  };
-
   render() {
-    const {
-      query,
-      images,
-      isLoading,
-      error,
-      loadMore,
-      isOpenModal,
-      img,
-      tags,
-    } = this.state;
+    const { query, images, isLoading, error, loadMore } = this.state;
     const isEmptyResults = query && !error && !isLoading && !images.length;
     const isNeedLoadMore = !isLoading && loadMore;
 
@@ -93,9 +71,7 @@ export class App extends Component {
         <GlobalStyle />
 
         <SearchBar onSubmit={this.searchFormSubmit} />
-        {images.length > 0 && (
-          <ImageGallery images={images} onOpen={this.openModal} />
-        )}
+        {images.length > 0 && <ImageGallery images={images} />}
         {isLoading && <Loader />}
         {isEmptyResults && (
           <Placeholder query={query}>
@@ -106,9 +82,6 @@ export class App extends Component {
           <Placeholder query={query}>Whooops.. {error.message}</Placeholder>
         )}
         {isNeedLoadMore && <LoadMoreBtn onClick={this.incrementPage} />}
-        {isOpenModal && (
-          <Modal img={img} tags={tags} onClose={this.closeModal} />
-        )}
       </AppWrapper>
     );
   }
