@@ -1,15 +1,16 @@
 import { Component } from 'react';
+import { Toaster } from 'react-hot-toast';
 
-import { SearchBar } from './SearchBar/SearchBar';
-import { ImageGallery } from './ImageGallery/ImageGallery';
-import { Loader } from './Loader/Loader';
-import { Placeholder } from './Placeholder/Placeholder';
-import { LoadMoreBtn } from './LoadMoreBtn/LoadMoreBtn';
+import { SearchBar } from 'components/SearchBar/SearchBar';
+import { ImageGallery } from 'components/ImageGallery/ImageGallery';
+import { Loader } from 'components/Loader/Loader';
+import { Placeholder } from 'components/Placeholder/Placeholder';
+import { LoadMoreBtn } from 'components/LoadMoreBtn/LoadMoreBtn';
 
-import { fetchImages, per_page } from 'services/api';
+import * as API from 'services/api';
 
-import { AppWrapper } from './App.styled';
 import { GlobalStyle } from './GlobalStyle';
+import { Layout } from './App.styled';
 
 export class App extends Component {
   state = {
@@ -23,20 +24,20 @@ export class App extends Component {
   };
 
   async componentDidUpdate(prevProps, prevState) {
+    const { query, page } = this.state;
     const prevQuery = prevState.query;
-    const currentQuery = this.state.query;
     const prevPage = prevState.page;
-    const currentPage = this.state.page;
 
-    if (prevQuery === currentQuery && prevPage === currentPage) {
+    if (prevQuery === query && prevPage === page) {
       return;
     }
 
-    this.setState({ isLoading: true });
-
     try {
-      const data = await fetchImages(currentQuery, currentPage);
-      const loadMore = currentPage * per_page < data.totalHits;
+      this.setState({ isLoading: true, error: null });
+
+      const searchQuery = query.slice(query.indexOf('/') + 1);
+      const data = await API.fetchImages(searchQuery, page);
+      const loadMore = page * API.per_page < data.totalHits;
 
       this.setState(prevState => ({
         images: [...prevState.images, ...data.hits],
@@ -50,14 +51,10 @@ export class App extends Component {
   }
 
   searchFormSubmit = query => {
-    if (this.state.query === query) {
-      return;
-    }
-
-    this.setState({ query, images: [], page: 1 });
+    this.setState({ query: `${Date.now()}/${query}`, images: [], page: 1 });
   };
 
-  incrementPage = () => {
+  handleLoadMore = () => {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
@@ -67,8 +64,9 @@ export class App extends Component {
     const isNeedLoadMore = !isLoading && loadMore;
 
     return (
-      <AppWrapper>
+      <Layout>
         <GlobalStyle />
+        <Toaster toastOptions={{ duration: 1500 }} />
 
         <SearchBar onSubmit={this.searchFormSubmit} />
         {images.length > 0 && <ImageGallery images={images} />}
@@ -81,8 +79,8 @@ export class App extends Component {
         {error && (
           <Placeholder query={query}>Whooops.. {error.message}</Placeholder>
         )}
-        {isNeedLoadMore && <LoadMoreBtn onClick={this.incrementPage} />}
-      </AppWrapper>
+        {isNeedLoadMore && <LoadMoreBtn onClick={this.handleLoadMore} />}
+      </Layout>
     );
   }
 }

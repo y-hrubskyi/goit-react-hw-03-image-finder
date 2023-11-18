@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { Searchbar, Form, Button, IconSearch, Input } from './SearchBar.styled';
 
 export const SearchBar = ({ onSubmit }) => {
@@ -6,7 +7,7 @@ export const SearchBar = ({ onSubmit }) => {
 
     const query = e.target.elements.query.value;
     if (!query) {
-      alert('Enter search query!');
+      toast.error('Enter search query!');
       return;
     }
 
