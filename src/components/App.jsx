@@ -60,6 +60,7 @@ export class App extends Component {
 
   render() {
     const { query, images, isLoading, error, loadMore } = this.state;
+    const searchQuery = query.slice(query.indexOf('/') + 1);
     const isEmptyResults = query && !error && !isLoading && !images.length;
     const isNeedLoadMore = !isLoading && loadMore;
 
@@ -72,14 +73,12 @@ export class App extends Component {
         {images.length > 0 && <ImageGallery images={images} />}
         {isLoading && <Loader />}
         {isEmptyResults && (
-          <Placeholder query={query}>
-            No any results by <b>"{query}"</b> request
+          <Placeholder>
+            No any results by <b>"{searchQuery}"</b> request
           </Placeholder>
         )}
-        {error && (
-          <Placeholder query={query}>Whooops.. {error.message}</Placeholder>
-        )}
-        {isNeedLoadMore && <LoadMoreBtn onClick={this.handleLoadMore} />}
+        {error && <Placeholder>Whooops.. {error.message}</Placeholder>}
+        {isNeedLoadMore && <LoadMoreBtn onLoadMore={this.handleLoadMore} />}
       </Layout>
     );
   }

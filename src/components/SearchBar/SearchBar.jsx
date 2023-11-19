@@ -5,8 +5,8 @@ export const SearchBar = ({ onSubmit }) => {
   const handleSubmit = e => {
     e.preventDefault();
 
-    const query = e.target.elements.query.value;
-    if (!query) {
+    const query = e.target.elements.query.value.trim();
+    if (query === '') {
       toast.error('Enter search query!');
       return;
     }
