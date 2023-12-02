@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-
 import { BiSearch } from 'react-icons/bi';
 
 export const Searchbar = styled.header`
